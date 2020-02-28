@@ -1,4 +1,6 @@
 function [u] = FuzzyInference(x, D, F)
+%% Main fuzzy function, uses the folders Fuzzifier and Defuzzifier
+
 %FuzzyInference selects the control action required to balance the cartpole
 
 % x(1) = x
@@ -7,6 +9,7 @@ function [u] = FuzzyInference(x, D, F)
 % x(4) = thetadot
 % x(5) = bias unit
 
+%x = matrix(5,1)  : input variables
 %D = matrix(13,4) : connection weights between input and hidden layer
 %F = matrix(13,1) : connection weights between hidden layer and output
 

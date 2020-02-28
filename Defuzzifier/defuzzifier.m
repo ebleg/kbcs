@@ -1,5 +1,5 @@
 function [m] = defuzzifier(w)
-% Deffuzifies the action
+% Defuzzifies the action
 
 %% Rules
 %Rule-l:    IF theta is PO      AND     thetadot is PO      THEN F is PL
