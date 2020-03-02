@@ -42,7 +42,7 @@ K = lqr(A, B, R, Q, N);
 lqrsys = ss(A - B*K, B, eye(4), 0);
 resp = step(ss);
 
-tSample = 0:1e-2:5;
+tSample = 0:1e-2:10;
 [y_lqr, t_lqr] = lsim(lqrsys, zeros(numel(tSample), 1), tSample, X0);
 
 run stateVisualisation
