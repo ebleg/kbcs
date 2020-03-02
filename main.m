@@ -13,7 +13,7 @@ close all;
 run parameters
 
 %% System dynamics
-X0 = [0 -2 0 pi/6];
+X0 = [0 -2 0 3*pi/6];
 T_MAX = 2;
 
 % Define control force
