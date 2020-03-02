@@ -10,6 +10,7 @@ push                = 1;
 weight_e            = ones(4,1); 
 weight_f            = ones(4,1); 
 weight_d            = ones(4,1); 
+stochastic          = ones(4,1); 
 
 input               = [2 1 2 1]';
 reinforcement       = [2 1 2 1]';
