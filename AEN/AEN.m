@@ -2,7 +2,6 @@
 
 x2 = [1 2 3 4 5]';
 start = true;
-r2 = 3;
 
 if start == true
     A1 = ones(5,5);
@@ -18,7 +17,7 @@ end
 [y2, v2] = AEN1(x2,A1,B1,C1);
 
 % Run AEN2
-[r_dakje2] = AEN2(r2,x2,v1,v2);
+[r_dakje2] = AEN2(x2,v1,v2);
 
 % Run AEN3
 [A2, B2, C2] = AEN3(A1, B1, C1, r_dakje2, x1, y1);
