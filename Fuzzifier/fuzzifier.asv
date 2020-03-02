@@ -45,7 +45,7 @@ Rules = ...
      @VS, @VS, @PO, @VS;...
      @VS, @VS, @PO, @PO}; %array of unargumented functions
  
- RulesX = zeros(size(Rules,1),size(Rules,2)); %matrix of solution of functions
+ RulesX = zeros(size(Rules,1),size(Rules,2)); %Array of argumented functions
  for i= 1:size(Rules,1)
      for j= 1:size(Rules,2)
        RulesX(i,j) = Rules{i,j}(x(j));
@@ -55,14 +55,14 @@ Rules = ...
 w = zeros(size(D,1),1);
 
 for i=1:length(w)
-    if i<=9 %9 is hardcoded, be careful
-        w(i) = min(D(i,2:4).*RulesX(i,2:4)); %2 to 4 is hardcoded, be careful
+    if i<=9
+        w(i) = min(D(i,2:4).*RulesX(i,2:4));
     else
         w(i) = min(D(i,:).*RulesX(i,:));
     end
 end
 
-%% test vector to check if w is correctly computed
+
 % wtest = zeros(size(D,1),1);
 % wtest(1) = min([D(1,3)*PO(x(3)), D(1,4)*PO(x(4))]);
 % wtest(2) = min([D(2,3)*PO(x(3)), D(2,4)*ZE(x(4))]);
