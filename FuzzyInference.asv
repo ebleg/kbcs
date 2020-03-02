@@ -1,7 +1,11 @@
-function [u] = FuzzyInference(x, D, F)
+function [u] = FuzzyInference()
 %% Main fuzzy function, uses the folders Fuzzifier and Defuzzifier
 
-
+x = rand(5,1);
+x(1) = -x(1);
+x(2) = -x
+D = rand(13,4);
+F = rand(13,1);
 %FuzzyInference selects the control action required to balance the cartpole
 
 % x(1) = x

@@ -1,49 +1,54 @@
 % ASN's neural network 
+%% parameters 
 
-rho     = 1; 
-rhoh    = 0.2; 
-beta    = 0.2; 
-betah   = 0.05; 
-gamma   = 0.9; 
+%run parameters 
 
-% q       = (p+1)/2;
-% 
-% if push > 0
-%     push' = q; 
-% else 
-%     push' = 1-q;
-% end 
-% 
-% for t = 1:10
-% d(t+1) = d(t) + rhoh*r(t+1)*z(t)*(1-z(t))*sign(f(t))*s(t)*x(t); 
-% end 
+rho                 = 1; 
+rhoh                = 0.2; 
+push                = 1;       
 
-%% weight function 
-function weight = calculateweight(weight, input, correct_output, reinforcement)
+weight_e            = ones(4,1); 
+weight_f            = ones(4,1); 
+weight_d            = ones(4,1); 
+stochastic          = ones(4,1); 
 
-N = 4;
-for k = 1:N 
-    transposedinput = input(k,:)'; 
-    d               = correct_output(k); 
-    weightsum       = weight*transposedinput; 
-    output          = Sigmoid(weightsum);
-    
-    error           = d- output;
-    delta           = output*(1-output)*error; 
-    
-    dweight         = rho*reinforcement*st*transposed_input; 
-    fweight         = rho*reinforcement*st*output;
-    
-    weight          = weight + rhoh*reinforcement*output*(1-output)*sign(weight)*st*transposed_input;
-    
-    probability     = 
-    
+input               = [2 1 2 1]';
+reinforcement       = [2 1 2 1]';
+
+
+p = calculateprobability(weight_e, weight_f,weight_d, input, reinforcement,rho,rhoh,stochastic);
+
+q = (p+1)/2;
+
+if push > 0 
+    pushd = q;
+else 
+    pushd = 1-q; 
 end 
+
+if sign(pushd) ~= sign(push)
+    stochastic = 1-p; 
+else 
+    stochastic = -p; 
 end 
 
 
+function p = calculateprobability(weight_e, weight_f,weight_d, input, reinforcement,rho,rhoh,stochastic)
 
-%% sigmoid 
+
+weighted_sum = weight_d.*(input);
+output = Sigmoid(weighted_sum);
+
+
+weight_e = weight_e + rho.*(reinforcement).*stochastic.*(input);
+weight_f = weight_f + rho.*(reinforcement).*stochastic.*output; 
+
+weight_d = weight_d + rhoh.*(reinforcement).*output.*(1-output).*sign(weight_f).*stochastic.*(input);
+
+p = weight_e.*(input) + weight_f.*output;
+
+end 
+
 function y = Sigmoid(x)
 y = 1/(1+exp(-x)); 
 end 
