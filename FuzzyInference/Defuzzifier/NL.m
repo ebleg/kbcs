@@ -1,19 +1,21 @@
 function [u_nl] = NL(x)
 %inverse membership function NL
 
-%variables to change
-zerobound = -2;
-onebound = -5;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Nl.a(2)-Nl.b(2))/(Nl.a(1)-Nl.b(1));
+b = Nl.a(2)-a*Nl.a(1);
 
-a = slope;
-b = -slope*zerobound;
-if x<=(zerobound*a+b) && x>= (onebound*a+b)
+bound1 = Nl.a(1)*a+b;
+bound2 = Nl.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_nl = (x-b)/a;
     
 else 
     u_nl = 0;
 end
+
+
+
+
 

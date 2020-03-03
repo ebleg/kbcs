@@ -1,20 +1,16 @@
 function [u_pm] = PM(x)
 %inverse membership function PM
 
-%variables to change
-zerobound = 1;
-onebound = 3;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Pm.a(2)-Pm.b(2))/(Pm.a(1)-Pm.b(1));
+b = Pm.a(2)-a*Pm.a(1);
 
-a = slope;
-b = -slope*zerobound;
-if x>=(zerobound*a+b) && x<=(onebound*a+b)
+bound1 = Pm.a(1)*a+b;
+bound2 = Pm.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_pm = (x-b)/a;
     
 else 
     u_pm = 0;
-    
 end
-

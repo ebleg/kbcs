@@ -1,17 +1,14 @@
 function [u_ns] = NS(x)
 %inverse membership function NS
 
-%variables to change
-zerobound = -2.5;
-onebound = 0.;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Ns.a(2)-Ns.b(2))/(Ns.a(1)-Ns.b(1));
+b = Ns.a(2)-a*Ns.a(1);
 
-a = slope;
-b = -slope*zerobound;
-
-if x>=(zerobound*a+b) && x<=(onebound*a+b)
+bound1 = Ns.a(1)*a+b;
+bound2 = Ns.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_ns = (x-b)/a;
     
 else 

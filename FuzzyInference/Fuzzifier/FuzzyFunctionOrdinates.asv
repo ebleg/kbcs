@@ -1,0 +1,20 @@
+%% this file contains the ordinates of the fuzzifier functions
+
+%NE function
+Ne.a = -2;      %left ordinate
+Ne.b = -1;      %right ordinate
+
+%VS function
+Vs.a = -1.5;    %left 
+Vs.b = 0;       %central
+Vs.c = -Vs.a;   %right
+
+%ZE function
+Ze.a = -0.5;    %left
+Ze.b = 0;       
+Ze.c = -Ze.a;
+
+%PO function
+Po.a = -Ne.b;
+Po.b = -Ne.a;
+

@@ -1,20 +1,16 @@
 function [u_ps] = PS(x)
 %inverse membership function PS
 
-%variables to change
-zerobound = 2.5;
-onebound = 0.;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Ps.a(2)-Ps.b(2))/(Ps.a(1)-Ps.b(1));
+b = Ps.a(2)-a*Ps.a(1);
 
-a = slope;
-b = -slope*zerobound;
-
-if x<=(zerobound*a+b) && x>= (onebound*a+b)
+bound1 = Ps.a(1)*a+b;
+bound2 = Ps.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_ps = (x-b)/a;
     
 else 
     u_ps = 0;
-    
 end

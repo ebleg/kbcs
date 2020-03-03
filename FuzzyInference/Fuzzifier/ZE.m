@@ -1,21 +1,6 @@
 function [u_ze] = ZE(x)
 %membership function ZE
 
-%variables to change
-zeroboundleft = -1;
-onebound  = 0.;
+run FuzzyFunctionOrdinates
 
-%not to change
-slopeleft = 1./(onebound-zeroboundleft);
-zeroboundright = -zeroboundleft;
-sloperight = -slopeleft;
-
-if x>zeroboundleft && x<=onebound
-    u_ze = slopeleft*x-slopeleft*zeroboundleft;
-
-elseif x>onebound && x < zeroboundright
-    u_ze = sloperight*x-sloperight*zeroboundright;
-
-else
-    u_ze = 0;
-end
+u_ze = max(0,min([((x-Ze.a)/(Ze.b-Ze.a)),1,((Ze.c-x)/(Ze.c-Ze.b))]));

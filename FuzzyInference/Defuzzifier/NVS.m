@@ -1,16 +1,14 @@
 function [u_nvs] = NVS(x)
 %inverse membership function NVS
 
-%variables to change
-zerobound = -0.5;
-onebound = 0.;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Nvs.a(2)-Nvs.b(2))/(Nvs.a(1)-Nvs.b(1));
+b = Nvs.a(2)-a*Nvs.a(1);
 
-a = slope;
-b = -slope*zerobound;
-if x>=(zerobound*a+b) && x<= (onebound*a+b)
+bound1 = Nvs.a(1)*a+b;
+bound2 = Nvs.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_nvs = (x-b)/a;
     
 else 

@@ -1,21 +1,16 @@
 function [u_pl] = PL(x)
 %inverse membership function PL
 
-%variables to change
-zerobound = 2;
-onebound = 5;
+run DefuzzyFunctionCoordinates
 
-%not to change
-slope = 1/(onebound-zerobound);
+a = (Pl.a(2)-Pl.b(2))/(Pl.a(1)-Pl.b(1));
+b = Pl.a(2)-a*Pl.a(1);
 
-a = slope;
-b = -slope*zerobound;
-
-if x>=(zerobound*a+b) && x<=(onebound*a+b)
+bound1 = Pl.a(1)*a+b;
+bound2 = Pl.b(1)*a+b;
+if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_pl = (x-b)/a;
     
 else 
     u_pl = 0;
-    
 end
-
