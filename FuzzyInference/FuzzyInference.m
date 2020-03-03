@@ -1,6 +1,7 @@
 function [u] = FuzzyInference(x, D, F)
 %% Main fuzzy function, uses the folders Fuzzifier and Defuzzifier
 
+% random input to test function
 % x = rand(5,1);
 % D = rand(13,4);
 % F = rand(13,1);
@@ -25,13 +26,6 @@ addpath( "Defuzzifier",...
 w = fuzzifier(x, D);
 m = defuzzifier(w);
 
-utop=0;
-ubot=0;
-for i= 1:length(w)
-    utop = utop + F(i)*m(i)*w(i);
-    ubot = ubot + w(i) * F(i);
-end
-
-u = utop/ubot;
+u = norm(F.*m.*w)/norm(w.*F);
 end
 

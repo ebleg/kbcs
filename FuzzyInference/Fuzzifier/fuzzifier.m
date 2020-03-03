@@ -8,11 +8,11 @@ function [w] = fuzzifier(x, D)
 % x(5) = bias unit
 
 %% add bias to state variables
-
 xstate = zeros((length(x)-1),1); %vector with solely state variables
 for i = 1:(length(xstate))
     xstate(i) = x(i) + x(end);
 end
+
 %% Retrieve Rules
 run FuzzyRules
 Rules = Fuzzy_Rules(:,1:4);
