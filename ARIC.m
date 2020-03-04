@@ -1,7 +1,8 @@
 classdef ARIC < handle
-    % ARIC class defines a controller object
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% ARIC - Neuro-fuzzy controller class
+    
+    %%
+    % *ARIC properties*
     properties
         A, b, c, D, e, f, v, s, z, rhat;
     end
@@ -10,13 +11,14 @@ classdef ARIC < handle
         n, h, rho, rhoh, beta, betah, gamma;
     end
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%% System methods %%%%%%%%%%%%%%%%%%%%%%%%%%
     methods
-        % Initialize controller parameters
-        function obj = ARIC(param)
-            % Input methods here
+    
+    %%
+    % *Class construction*
+    % Input argument 'param' contains the settings the learning process.
+            function obj = ARIC(param)
             % ARIC Construct an instance of this class
-            % n = number of states + 1 (5 in the cart pole example)
+            % n = number of states + 1 (4 in the cart pole example)
             % h = number of rules (13 in the cart pole example)
             obj.n = param.aric.n;
             obj.h = param.aric.h;        
@@ -40,20 +42,22 @@ classdef ARIC < handle
             obj.s = rand(); % SCALAR
             obj.z = rand(obj.h, 1); % COLUMN VECTOR WITH LENGHT H
             
-        end
-                
-        %% Master loop
-        % This function is called by Simulink in order to compute the 
+            end
+        
+        %%
+        % *Master loop*
+        % This function is called by main in order to compute the 
         % control force based on the states
         function F = getControllerOutput(obj, x)
             % Action selection network
-            u = obj.fuzzyInference(x); % Fuzzy inference
-            p = obj.confidenceComputation(x);
-            obj.updateWeights(x);
-            F = obj.stochasticActionModifier(u, p);
+            u = obj.fuzzyInference(x); % Compute u based on fuzzy rules
+            p = obj.confidenceComputation(x); % Compute confidence p
+            obj.updateWeights(x); % Apply learning algorithms
+            F = obj.stochasticActionModifier(u, p); % Compute Stochastic Object Modifier F
         end
         
-        %% Action-State Evaluation
+        %%
+        % *Action-State Evaluation*
         function [y, v] = stateEvaluation(obj, x)
             % Implementation of Maxime's AEN1 - neural network of AEN
             y = arrayfun(@sigmoid, obj.A*x);  % Neural network
@@ -90,8 +94,8 @@ classdef ARIC < handle
             obj.D = obj.D + obj.rhoh*obj.rhat*obj.z.*(1-obj.z).*sign(obj.f)'*obj.s*x';
         end
         
-
-        %% Action Selection Network methods     
+        %%
+        % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
             
@@ -114,7 +118,7 @@ classdef ARIC < handle
         end
         
         function u_mod = stochasticActionModifier(obj, u, p)
-           % Implementation of functions o and s in the paper
+           % _Implementation of functions o and s in the paper_
            
            q = (p + 1)/2;
            if u > 0
