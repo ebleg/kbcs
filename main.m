@@ -8,8 +8,9 @@
 
 clear; 
 close all;
-addpath('./defuzzifier');
-addpath('./fuzzifier');
+addpath('./fuzzyInference/');
+addpath('./fuzzyInference/defuzzifier');
+addpath('./fuzzyInference/fuzzifier');
 addpath('./tools');
 addpath('./data');
 
