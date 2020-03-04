@@ -8,47 +8,69 @@
 
 clear; 
 close all;
+addpath('./defuzzifier');
+addpath('./fuzzifier');
+addpath('./tools');
+addpath('./data');
 
 %% Parameters
-run parameters
-
-%% System dynamics
-X0 = [0 -2 0 3*pi/6];
-T_MAX = 2;
-
-% Define control force
-% forcing = @(t) sin(2*t);
-forcing = @(t) 0;
-
-fhandle = @(t, X) systemDynamics(X, forcing(t), param);
-[t, y] = ode45(fhandle, [0 T_MAX], X0);
+load('parameters_v1.mat');
 
 %% Linearization
 % Compute Jacobians - 3d party code
 % (https://nl.mathworks.com/matlabcentral/fileexchange/13490-adaptive-robust-numerical-differentiation)
 A = jacobianest(@(X) systemDynamics(X, 0, param), [0 0 0 0]');
 B = jacobianest(@(U) systemDynamics([0 0 0 0]', U, param), 0);
-
 f_linearized = @(t, X) A*X + B*forcing(t);
-[t_lin, y_lin] = ode45(f_linearized, [0 T_MAX], X0);
 
-%% Control
-% Simple LQR control
+%% Simple LQR control
 R = eye(4);
 Q = 1;
 N = zeros(4, 1);
 K = lqr(A, B, R, Q, N);
-
 lqrsys = ss(A - B*K, B, eye(4), 0);
 resp = step(ss);
 
-tSample = 0:1e-2:10;
-[y_lqr, t_lqr] = lsim(lqrsys, zeros(numel(tSample), 1), tSample, X0);
+%% Neuro-fuzzy controller simulation
+T_MAX = 100;    % Max simulation time
+h = 1e-2;       % RK4 step size
+nstates = 4;
 
-run stateVisualisation
+% Initialize controller
+aric = ARIC(param);
+learningComplete = false;
+nTries = 0;
 
+% Learning loop
+while ~learningComplete
+    % Initialize variables
+    trange = nan(size(0:h:T_MAX)); % Useful for plotting, trange and x will always have the same length
+    x = nan(nstates, numel(trange));
+    u = nan(size(trange));
+    i = 2; % Don't overwrite initial condition
 
+    % Initial conditions
+    x(:, 1) = [0 0 0 pi/6]';
+    
+    failed = false;
 
+    % Simulation loop
+    while ~failed && i <= T_MAX/h
+        u(i) = aric.getControllerOutput(x(:, i-1));
+        f = @(x) systemDynamics(x, u(i), param); % New function handle at each timestep probably computational nightmare, but leave it for now
+        x(:, i) = RK4(f, x(:, i-1), h);
 
-
-
+        % Failure condition
+        if abs(x(1, i)) > 2.4 || abs(x(3, i)) > 12*pi/180
+            failed = true;
+        end
+        i = i + 1;
+    end
+    
+    nTries = nTries + 1;
+    fprintf('Try #%d: t_max = %f\n', nTries, i*h)
+    
+    if i >= round(T_MAX/h, 0)
+       learningComplete = true; 
+    end
+end

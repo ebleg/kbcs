@@ -1,32 +1,35 @@
-classdef ARIC < handle
+classdef ARIC < matlab.System
     % ARIC class defines a controller object
 
     %%%%%%%%%%%%%%%%%%%%%%%%%% System properties %%%%%%%%%%%%%%%%%%%%%%%%%%
-    properties
-        A, b, c, D, e, f, v, s, z, rhat;
+    properties (DiscreteState)
+        A, b, c, D, e, f, v, s, z;
     end
     
-    properties
+    properties (Nontunable)
         n, h, rho, rhoh, beta, betah, gamma;
     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%% System methods %%%%%%%%%%%%%%%%%%%%%%%%%%
-    methods
-        % Initialize controller parameters
-        function obj = ARIC(param)
-            % Input methods here
-            % ARIC Construct an instance of this class
-            % n = number of states + 1 (5 in the cart pole example)
-            % h = number of rules (13 in the cart pole example)
-            obj.n = param.aric.n;
-            obj.h = param.aric.h;        
-
-            obj.rho = param.aric.rho;
-            obj.rhoh = param.aric.rhoh;
-            obj.beta = param.aric.beta;
-            obj.betah = param.aric.betah;
-            obj.gamma = param.aric.gamma;        
-        
+    methods (Access = protected)     
+        %% Initialize controller parameters
+%         function setupImpl(obj)
+%             Input methods here
+%             ARIC Construct an instance of this class
+%             n = number of states + 1 (5 in the cart pole example)
+%             h = number of rules (13 in the cart pole example)
+%             obj.n = 5;
+%             obj.h = 13;        
+% 
+%             obj.rho = 1;
+%             obj.rhoh = 0.2;
+%             obj.beta = 0.2;
+%             obj.betah = 0.05;
+%             obj.gamma = 0.9;        
+%         end
+%         
+        %% Initialize controller 'state'
+        function resetImpl(obj)
             % Action-state Evaluation Method weights
             obj.A = rand(obj.n, obj.n); % SQUARE MATRIX
             obj.b = rand(1, obj.n); % ROW VECTOR WITH LENGTH N
@@ -45,7 +48,7 @@ classdef ARIC < handle
         %% Master loop
         % This function is called by Simulink in order to compute the 
         % control force based on the states
-        function F = getControllerOutput(obj, x)
+        function F = stepImpl(obj, x)
             % Action selection network
             u = obj.fuzzyInference(x); % Fuzzy inference
             p = obj.confidenceComputation(x);
@@ -56,7 +59,7 @@ classdef ARIC < handle
         %% Action-State Evaluation
         function [y, v] = stateEvaluation(obj, x)
             % Implementation of Maxime's AEN1 - neural network of AEN
-            y = arrayfun(@sigmoid, obj.A*x);  % Neural network
+            y = arrayfun(@Sigmoid, obj.A*x);  % Neural network
             v = obj.b*x + obj.c*y;
         end
         
@@ -82,12 +85,12 @@ classdef ARIC < handle
             % Update AEN weights
             obj.b = obj.b + (obj.beta*obj.rhat*x)'; % b is stored as a row vector
             obj.c = obj.c + (obj.beta*obj.rhat*y)'; % c is stored as a row vector
-            obj.A = obj.A + (obj.betah*obj.rhat).*sign(obj.c)'.*y.*(1 - y)*x';
+            obj.A = obj.A + (obj.betah*obj.rhat).*sign(obj.C)'.*y.*(1 - y)*x';
             
             % Update ASN weights
             obj.e = obj.e + (obj.rho*obj.rhat*obj.s*x)';
-            obj.f = obj.f + (obj.rho*obj.rhat*obj.s*obj.z)';
-            obj.D = obj.D + obj.rhoh*obj.rhat*obj.z.*(1-obj.z).*sign(obj.f)'*obj.s*x';
+            obj.f = obj.f + (obj.rho*obj.rhat*obj.s*z)';
+            obj.D = obj.D + obj.rhoh*obj.rhat*obj.z.*(1-obj.z).*sign(obj.f)*obj.s*x';
         end
         
 
@@ -109,7 +112,7 @@ classdef ARIC < handle
         end
         
         function p = confidenceComputation(obj, x)
-            obj.z = arrayfun(@sigmoid, obj.D*x);
+            obj.z = arrayfun(@Sigmoid, obj.D*x);
             p = obj.e*x + obj.f*obj.z;
         end
         
@@ -117,11 +120,7 @@ classdef ARIC < handle
            % Implementation of functions o and s in the paper
            
            q = (p + 1)/2;
-           if u > 0
-              u_mod = q;
-           else
-               u_mod = 1 - q;
-           end
+           u_mod = q*u - (1-q)*u; % Still slightly unclear
            
            if sign(u_mod) ~= sign(u)
                obj.s = 1 - p;
