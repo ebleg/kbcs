@@ -3,7 +3,7 @@ function [u] = FuzzyInference(x, D, F)
 
 % random input to test function
 % x = rand(5,1);
-% D = rand(13,4);
+% D = rand(13,5);
 % F = rand(13,1);
 
 %FuzzyInference selects the control action required to balance the cartpole
