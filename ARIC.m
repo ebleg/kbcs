@@ -102,7 +102,7 @@ classdef ARIC < handle
             w = fuzzifier(x, obj.D);
             m = defuzzifier(w);
             
-            u = sum(F.*m.*w)/sum(w.*F);
+            u = sum(obj.f.*m.*w)/sum(w.*obj.f);
         end
         
         function p = confidenceComputation(obj, x)
