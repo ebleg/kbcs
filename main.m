@@ -51,16 +51,21 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0 0 pi/20]';
+    x(:, 1) = [0 0.05 0 0]';
     
     failed = false;
+    reset = true;
 
     % Simulation loop
     while ~failed && i <= T_MAX/h
         u(i) = aric.getControllerOutput(x(:, i-1));
         f = @(x) systemDynamics(x, u(i), param); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), h);
-        failed = aric.updateWeights(x(:, i));
+        failed = aric.updateWeights(x(:, i), reset);
+        
+        if reset
+            reset = false;
+        end
         
         i = i + 1;
     end

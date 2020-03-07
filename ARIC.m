@@ -7,8 +7,8 @@ classdef ARIC < handle
         A, b, c, D, e, f
     end
     
-    properties % AEN outputs
-        vOld, xOld, yOld, s, z;
+    properties 
+        s, z, x1;
     end
     
     properties % Parameters
@@ -16,7 +16,6 @@ classdef ARIC < handle
     end
     
     methods
-    
     %%
     % *Class construction*
     % Input argument 'param' contains the settings the learning process.
@@ -47,11 +46,9 @@ classdef ARIC < handle
             obj.e = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
             obj.f = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
             
-            obj.vOld = 0; % SCALAR
             obj.s = 0; % SCALAR
             obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H  
-            obj.yOld = zeros(obj.n, 1);
-            obj.xOld = zeros(obj.n, 1);
+            obj.x1 = zeros(obj.n, 1);
             end
         
         %%
@@ -60,50 +57,57 @@ classdef ARIC < handle
         % control force based on the states
         function [F] = getControllerOutput(obj, x)
             % Action selection network
-            obj.xOld = [x' 1]';
-            u = obj.fuzzyInference(obj.xOld); % Compute u based on fuzzy rules
-            p = obj.confidenceComputation(obj.xOld); % Compute confidence p
-            F = obj.stochasticActionModifier(u, p); % Compute Stochastic Object Modifier F
+            obj.x1 = [x' 1]';
+            u = obj.fuzzyInference(obj.x1); % Compute u based on fuzzy rules
+            p = obj.confidenceComputation(obj.x1); % Compute confidence p
+            F = obj.stochasticActionModifier(u, p); % Compute Stochastic Object Modifier F            
         end
         
         % Adapting the ARIC based on a new state
-        function flag = updateWeights(obj, x)
+        function flag = updateWeights(obj, x, reset)
             % Compute necessary values from AEN
-            xNew = [x' 1]';
-            flag = obj.checkForFailure(xNew);
-            [yNew, vNew] = obj.stateEvaluation(xNew);
-            rhat = obj.internalReinforcement(vNew, flag);
+            x2 = [x' 1]';
+            flag = obj.checkForFailure(x2);
+            
+            y1 = obj.AENHiddenLayer(obj.x1); % y[t, t]
+            y2 = obj.AENHiddenLayer(x2);     % y[t, t+1]
+            
+            v1 = obj.AENOutputLayer(obj.x1, y1);  % v[t, t]
+            v2 = obj.AENOutputLayer(x2, y2);      % v[t, t+1]
+
+            rhat = obj.internalReinforcement(v1, v2, flag, reset);
             
             % Update AEN weights
-            obj.b = obj.b + (obj.beta*rhat*obj.xOld)'; % b is stored as a row vector
-            obj.c = obj.c + (obj.beta*rhat*obj.yOld)'; % c is stored as a row vector
-            obj.A = obj.A + (obj.betah*rhat).*sign(obj.c)'.*obj.yOld.*(1 - obj.yOld)*obj.xOld';
+            obj.b = obj.b + (obj.beta*rhat*obj.x1)'; % b is stored as a row vector
+            obj.c = obj.c + (obj.beta*rhat*y1)'; % c is stored as a row vector
+            obj.A = obj.A + (obj.betah*rhat).*sign(obj.c)'.*y1.*(1 - y1)*obj.x1';
             
             % Update ASN weights
-            obj.e = obj.e + (obj.rho*rhat*obj.s*obj.xOld)';
+            obj.e = obj.e + (obj.rho*rhat*obj.s*obj.x1)';
             obj.f = obj.f + (obj.rho*rhat*obj.s*obj.z)';
-            obj.D = obj.D + obj.rhoh*rhat*obj.z.*(1 - obj.z).*sign(obj.f)'*obj.s*obj.xOld';
-            
-            % Update v, y, x
-            obj.vOld = vNew;
-            obj.yOld = yNew;
-            obj.xOld = xNew;
+            obj.D = obj.D + obj.rhoh*rhat*obj.z.*(1 - obj.z).*sign(obj.f)'*obj.s*obj.x1';
         end
         
         %%
         % *Action-State Evaluation*
-        function [y, v] = stateEvaluation(obj, x)
-            % Implementation of Maxime's AEN1 - neural network of AEN
+        function y = AENHiddenLayer(obj, x)
+            % Computation of y[t1, t2]
             y = obj.sigmoid(obj.A*x);  % Neural network
+        end
+        
+        function v = AENOutputLayer(obj, x, y) 
+            % Computation of v[t1, t2]
             v = obj.b*x + obj.c*y;
         end
         
-        function rhat = internalReinforcement(obj, vNew, flag)
+        function rhat = internalReinforcement(obj, v1, v2, flag, reset)
            % Implementation of Maxime's AEN2 - Computation of the internal reinforcement r_hat 
            if flag  %[m]
-               rhat = -1 - obj.vOld;
+               rhat = -1 - v1;
+           elseif reset
+               rhat = 0;
            else
-               rhat = obj.gamma*vNew - obj.vOld;
+               rhat = obj.gamma*v2 - v1;
            end
         end
         
@@ -117,24 +121,24 @@ classdef ARIC < handle
         end
         
         function p = confidenceComputation(obj, x)
-            obj.z = obj.sigmoid(obj.D*x);
+            obj.z = obj.sigmoid(obj.D*x); % We'll need z later for the weight modification
             p = obj.e*x + obj.f*obj.z;
         end
         
         function u_mod = stochasticActionModifier(obj, u, p)
            % _Implementation of functions o and s in the paper_
            q = (p + 1)/2;
-           if u > 0
-              u_mod = q;
+           if q > (1-q)
+               u_mod = u;
            else
-               u_mod = 1 - q;
+               u_mod = -u;
            end
            
            if sign(u_mod) ~= sign(u)
-               obj.s = 1 - p;
+               obj.s = 1 - p; % We'll need s later for the weight modification
            else
                obj.s = -p;
-           end         
+           end
         end
     end
     
