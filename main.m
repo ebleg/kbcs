@@ -15,7 +15,7 @@ addpath('./tools');
 addpath('./data');
 
 %% Parameters
-load('parameters_v1.mat');
+load('parameters_v2.mat'); % System parameters from Anderson [13]
 
 %% Linearization
 % Compute Jacobians - 3d party code
@@ -51,7 +51,7 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0 0 pi/6]';
+    x(:, 1) = [0 0 0 pi/20]';
     
     failed = false;
 
@@ -60,11 +60,8 @@ while ~learningComplete
         u(i) = aric.getControllerOutput(x(:, i-1));
         f = @(x) systemDynamics(x, u(i), param); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), h);
-
-        % Failure condition
-        if abs(x(1, i)) > 2.4 || abs(x(3, i)) > 12*pi/180
-            failed = true;
-        end
+        failed = aric.updateWeights(x(:, i));
+        
         i = i + 1;
     end
     
