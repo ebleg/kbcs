@@ -1,8 +1,8 @@
 %% this file contains the coordinates of the fuzzifier functions
 
 %NL function
-Nl.a = [-5, 1];      %left coordinate
-Nl.b = [-2, 0];      %right x-ordinate
+Nl.a = [-20, 1];      %left coordinate
+Nl.b = [-15, 0];      %right x-ordinate
 
 %NM function
 Nm.a = [-3, 1];      %left

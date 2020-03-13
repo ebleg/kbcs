@@ -10,7 +10,6 @@ bound1 = Nm.a(1)*a+b;
 bound2 = Nm.b(1)*a+b;
 if x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_nm = (x-b)/a;
-    
 else 
     u_nm = 0;
 end
