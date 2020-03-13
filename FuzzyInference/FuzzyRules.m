@@ -1,20 +1,5 @@
 %% Define the rules of the fuzzy logic
 
-%Rule-l:    IF theta is PO      AND     thetadot is PO      THEN F is PL
-%Rule-2:    IF theta is PO      AND     thetadot is ZE      THEN F is PM 
-%Rule-3:    IF theta is PO      AND     thetadot is NE      THEN F is ZE
-%Rule-4:    IF theta is ZE      AND     thetadot is PO      THEN F is PS
-%Rule-5:    IF theta is ZE      AND     thetadot is ZE      THEN F is ZE
-%Rule-6:    IF theta is ZE      AND     thetadot is NE      THEN F is NS
-%Rule-7:    IF theta is NE      AND     thetadot is PO      THEN F is ZE
-%Rule-8:    IF theta is NE      AND     thetadot is ZE      THEN F is NM
-%Rule-9:    IF theta is NE      AND     thetadot is NE      THEN F is NL 
-
-%Rule-10:   IF theta is VS      AND     thetadot is VS      AND     x is NE     AND     xdot is NE      THEN F is NS       
-%Rule-11:   IF theta is VS      AND     thetadot is VS      AND     x is NE     AND     xdot is VS      THEN F is NVS 
-%Rule-12:   IF theta is VS      AND     thetadot is VS      AND     x is PO     AND     xdot is VS      THEN F is PVS
-%Rule-12:   IF theta is VS      AND     thetadot is VS      AND     x is PO     AND     xdot is PO      THEN F is PS
-
 Fuzzy_Rules = ...
     {@zero, @zero, @PO1, @PO2, @one, @PL;...
      @zero, @zero, @PO1, @ZE2, @one, @PM;...
