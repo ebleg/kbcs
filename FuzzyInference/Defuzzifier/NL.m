@@ -8,7 +8,10 @@ b = Nl.a(2)-a*Nl.a(1);
 
 bound1 = Nl.a(1)*a+b;
 bound2 = Nl.b(1)*a+b;
-if x>=min(bound1,bound2) && x<=max(bound1,bound2)
+if x<min(bound1,bound2)
+    u_nl = 1;
+
+elseif x>=min(bound1,bound2) && x<=max(bound1,bound2)
     u_nl = (x-b)/a;
     
 else 
