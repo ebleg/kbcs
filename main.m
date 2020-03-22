@@ -16,6 +16,7 @@ addpath('./data');
 
 %% Parameters
 load('parameters_v2.mat'); % System parameters from Anderson [13]
+% load('parameters_easy.mat'); % Longer pole length
 
 %% Linearization
 % Compute Jacobians - 3d party code
@@ -51,7 +52,7 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0.05 0 0]';
+    x(:, 1) = [0 0.2 0 0]';
     
     failed = false;
     reset = true;
