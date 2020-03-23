@@ -12,6 +12,7 @@ Rules = Fuzzy_Rules(:,1:5);
        RulesX(i,j) = Rules{i,j}(x(j));
      end
  end
+ 
 %% Create w vector
 w = zeros(size(RulesX,1),1);
 for i=1:length(w)
@@ -20,6 +21,5 @@ for i=1:length(w)
     else
         w(i) = min(D(i,:).*RulesX(i,:));
     end
-
 end
 

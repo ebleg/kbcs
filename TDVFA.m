@@ -3,17 +3,12 @@ classdef TDVFA < handle
     properties
        w, 
     end
-    
     methods
         function obj = TDVFA(param)
             w = rand(4,1);
         end
-        
-        function F = getControllerOutput(obj, x)
-            
-        end
-        
+        function F = getControllerOutput(obj, x) 
+        end   
     end
-    
 end
 

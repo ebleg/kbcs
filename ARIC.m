@@ -1,10 +1,8 @@
 classdef ARIC < handle
     %% ARIC - Neuro-fuzzy controller class
-    
-    %%
     % *ARIC properties*
     properties % Weights
-        A, b, c, D, e, f
+        A, b, c, D, e, f, fuzzyRules
     end
     
     properties 
@@ -19,22 +17,22 @@ classdef ARIC < handle
     %%
     % *Class construction*
     % Input argument 'param' contains the settings the learning process.
-            function obj = ARIC(param)
+            function obj = ARIC(par)
             % ARIC Construct an instance of this class
             % n = number of states + 1 (4 in the cart pole example)
             % h = number of rules (13 in the cart pole example)
             a = -0.1; % From Anderson [13]
             b = 0.1;
-            rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);
+            rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);  % random numbers in [a,b]
             
-            obj.n = param.aric.n;
-            obj.h = param.aric.h;        
+            obj.n = par.aric.n;
+            obj.h = par.aric.h;        
 
-            obj.rho = param.aric.rho;
-            obj.rhoh = param.aric.rhoh;
-            obj.beta = param.aric.beta;
-            obj.betah = param.aric.betah;
-            obj.gamma = param.aric.gamma;        
+            obj.rho = par.aric.rho;
+            obj.rhoh = par.aric.rhoh;
+            obj.beta = par.aric.beta;
+            obj.betah = par.aric.betah;
+            obj.gamma = par.aric.gamma;        
         
             % Action-state Evaluation Method weights
             obj.A = rand_int(obj.n, obj.n); % SQUARE MATRIX
@@ -115,9 +113,11 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
+%             x(3:4) = rad2deg(x(3:4));
             w = fuzzifier(x, obj.D);
             m = defuzzifier(w);
-            u = sum(obj.f.*m.*w)/sum(w.*obj.f);
+            filter = m ~= 0;
+            u = sum(obj.f(filter).*m(filter).*w(filter))/sum(w(filter).*obj.f(filter));
         end
         
         function p = confidenceComputation(obj, x)
@@ -156,4 +156,3 @@ classdef ARIC < handle
         end
     end
 end
-
