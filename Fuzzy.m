@@ -203,9 +203,9 @@ classdef Fuzzy
             u = 0;
         end
 
-            %% Defuzzication membership functions
-            %inverse membership function NL
-            function [u_nl] = NL(obj, x)
+        %% Defuzzication membership functions
+        %inverse membership function NL
+        function [u_nl] = NL(obj, x)
 
             a = (obj.Nl(1,2)-obj.Nl(2,2))/(obj.Nl(1,1)-obj.Nl(2,1));
             b = obj.Nl(1,2)-a*obj.Nl(1,1);
@@ -213,7 +213,7 @@ classdef Fuzzy
             bound1 = obj.Nl(1,1)*a+b;
             bound2 = obj.Nl(2,1)*a+b;
             if x<min(bound1,bound2)
-                u_nl = 1;
+                u_nl = min(bound1,bound2);
 
             elseif x>=min(bound1,bound2) && x<=max(bound1,bound2)
                 u_nl = (x-b)/a;
@@ -224,69 +224,72 @@ classdef Fuzzy
         end
         
         %inverse membership function NM
-        function [u_nm] = NM(obj, x)          
-            a1 = (obj.Nm(1,2)-obj.Nm(2,2))/(obj.Nm(1,1)-obj.Nm(2,1));
-            b1 = obj.Nm(1,2)-a1*obj.Nm(1,1);
-
-            a2 = (obj.Nm(2,2)-obj.Nm(3,2))/(obj.Nm(2,1)-obj.Nm(3,1));
-            b2 = obj.Nm(3,2)-a2*obj.Nm(3,1);
-
-            bound1 = obj.Nm(1,1)*a1+b1;
-            bound2 = obj.Nm(2,1)*a1+b1;
-            bound3 = obj.Nm(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_nm = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_nm = (x-b2)/a2;
-            else 
-                u_nm = 0;
-            end
+        function [u_nm] = NM(obj, x) 
+            u_nm = obj.Nm(2,1) + 0.5*(obj.Nm(1,1)-2*obj.Nm(2,1)+obj.Nm(3,1))*(1-x);
+%             a1 = (obj.Nm(1,2)-obj.Nm(2,2))/(obj.Nm(1,1)-obj.Nm(2,1));
+%             b1 = obj.Nm(1,2)-a1*obj.Nm(1,1);
+% 
+%             a2 = (obj.Nm(2,2)-obj.Nm(3,2))/(obj.Nm(2,1)-obj.Nm(3,1));
+%             b2 = obj.Nm(3,2)-a2*obj.Nm(3,1);
+% 
+%             bound1 = obj.Nm(1,1)*a1+b1;
+%             bound2 = obj.Nm(2,1)*a1+b1;
+%             bound3 = obj.Nm(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_nm = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_nm = (x-b2)/a2;
+%             else 
+%                 u_nm = 0;
+%             end
         end
         
         %inverse membership function NS
         function [u_ns] = NS(obj, x)
-            a1 = (obj.Ns(1,2)-obj.Ns(2,2))/(obj.Ns(1,1)-obj.Ns(2,1));
-            b1 = obj.Ns(1,2)-a1*obj.Ns(1,1);
-
-            a2 = (obj.Ns(2,2)-obj.Ns(3,2))/(obj.Ns(2,1)-obj.Ns(3,1));
-            b2 = obj.Ns(3,2)-a2*obj.Ns(3,1);
-
-            bound1 = obj.Ns(1,1)*a1+b1;
-            bound2 = obj.Ns(2,1)*a1+b1;
-            bound3 = obj.Ns(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_ns = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_ns = (x-b2)/a2;
-            else 
-                u_ns = 0;
-            end
+            u_ns = obj.Ns(2,1) + 0.5*(obj.Ns(1,1)-2*obj.Ns(2,1)+obj.Ns(3,1))*(1-x);
+%             a1 = (obj.Ns(1,2)-obj.Ns(2,2))/(obj.Ns(1,1)-obj.Ns(2,1));
+%             b1 = obj.Ns(1,2)-a1*obj.Ns(1,1);
+% 
+%             a2 = (obj.Ns(2,2)-obj.Ns(3,2))/(obj.Ns(2,1)-obj.Ns(3,1));
+%             b2 = obj.Ns(3,2)-a2*obj.Ns(3,1);
+% 
+%             bound1 = obj.Ns(1,1)*a1+b1;
+%             bound2 = obj.Ns(2,1)*a1+b1;
+%             bound3 = obj.Ns(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_ns = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_ns = (x-b2)/a2;
+%             else 
+%                 u_ns = 0;
+%             end
         end
         
         %inverse membership function NVS
         function [u_nvs] = NVS(obj, x)
-            a1 = (obj.Nvs(1,2)-obj.Nvs(2,2))/(obj.Nvs(1,1)-obj.Nvs(2,1));
-            b1 = obj.Nvs(1,2)-a1*obj.Nvs(1,1);
-
-            a2 = (obj.Nvs(2,2)-obj.Nvs(3,2))/(obj.Nvs(2,1)-obj.Nvs(3,1));
-            b2 = obj.Nvs(3,2)-a2*obj.Nvs(3,1);
-
-            bound1 = obj.Nvs(1,1)*a1+b1;
-            bound2 = obj.Nvs(2,1)*a1+b1;
-            bound3 = obj.Nvs(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_nvs = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_nvs = (x-b2)/a2;
-            else 
-                u_nvs = 0;
-            end
+            u_nvs = obj.Nvs(2,1) + 0.5*(obj.Nvs(1,1)-2*obj.Nvs(2,1)+obj.Nvs(3,1))*(1-x);
+%             a1 = (obj.Nvs(1,2)-obj.Nvs(2,2))/(obj.Nvs(1,1)-obj.Nvs(2,1));
+%             b1 = obj.Nvs(1,2)-a1*obj.Nvs(1,1);
+% 
+%             a2 = (obj.Nvs(2,2)-obj.Nvs(3,2))/(obj.Nvs(2,1)-obj.Nvs(3,1));
+%             b2 = obj.Nvs(3,2)-a2*obj.Nvs(3,1);
+% 
+%             bound1 = obj.Nvs(1,1)*a1+b1;
+%             bound2 = obj.Nvs(2,1)*a1+b1;
+%             bound3 = obj.Nvs(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_nvs = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_nvs = (x-b2)/a2;
+%             else 
+%                 u_nvs = 0;
+%             end
         end
         
         %inverse membership function PL
@@ -297,7 +300,7 @@ classdef Fuzzy
             bound1 = obj.Pl(1,1)*a+b;
             bound2 = obj.Pl(2,1)*a+b;
             if x>max(bound1,bound2)
-                u_pl = 1;
+                u_pl = max(bound1,bound2);
 
             elseif x>=min(bound1,bound2) && x<=max(bound1,bound2)
                 u_pl = (x-b)/a;
@@ -309,90 +312,94 @@ classdef Fuzzy
         
         %inverse membership function PM
         function [u_pm] = PM(obj, x)
-            a1 = (obj.Pm(1,2)-obj.Pm(2,2))/(obj.Pm(1,1)-obj.Pm(2,1));
-            b1 = obj.Pm(1,2)-a1*obj.Pm(1,1);
-
-            a2 = (obj.Pm(2,2)-obj.Pm(3,2))/(obj.Pm(2,1)-obj.Pm(3,1));
-            b2 = obj.Pm(3,2)-a2*obj.Pm(3,1);
-
-            bound1 = obj.Pm(1,1)*a1+b1;
-            bound2 = obj.Pm(2,1)*a1+b1;
-            bound3 = obj.Pm(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_pm = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_pm = (x-b2)/a2;
-            else 
-                u_pm = 0;
-            end
+            u_pm = obj.Pm(2,1) + 0.5*(obj.Pm(1,1)-2*obj.Pm(2,1)+obj.Pm(3,1))*(1-x);
+%             a1 = (obj.Pm(1,2)-obj.Pm(2,2))/(obj.Pm(1,1)-obj.Pm(2,1));
+%             b1 = obj.Pm(1,2)-a1*obj.Pm(1,1);
+% 
+%             a2 = (obj.Pm(2,2)-obj.Pm(3,2))/(obj.Pm(2,1)-obj.Pm(3,1));
+%             b2 = obj.Pm(3,2)-a2*obj.Pm(3,1);
+% 
+%             bound1 = obj.Pm(1,1)*a1+b1;
+%             bound2 = obj.Pm(2,1)*a1+b1;
+%             bound3 = obj.Pm(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_pm = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_pm = (x-b2)/a2;
+%             else 
+%                 u_pm = 0;
+%             end
         end
         
         %inverse membership function PS
         function [u_ps] = PS(obj, x)
-            a1 = (obj.Ps(1,2)-obj.Ps(2,2))/(obj.Ps(1,1)-obj.Ps(2,1));
-            b1 = obj.Ps(1,2)-a1*obj.Ps(1,1);
-
-            a2 = (obj.Ps(2,2)-obj.Ps(3,2))/(obj.Ps(2,1)-obj.Ps(3,1));
-            b2 = obj.Ps(3,2)-a2*obj.Ps(3,1);
-
-            bound1 = obj.Ps(1,1)*a1+b1;
-            bound2 = obj.Ps(2,1)*a1+b1;
-            bound3 = obj.Ps(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_ps = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_ps = (x-b2)/a2;
-            else 
-                u_ps = 0;
-            end
+            u_ps = obj.Ps(2,1) + 0.5*(obj.Ps(1,1)-2*obj.Ps(2,1)+obj.Ps(3,1))*(1-x);
+%             a1 = (obj.Ps(1,2)-obj.Ps(2,2))/(obj.Ps(1,1)-obj.Ps(2,1));
+%             b1 = obj.Ps(1,2)-a1*obj.Ps(1,1);
+% 
+%             a2 = (obj.Ps(2,2)-obj.Ps(3,2))/(obj.Ps(2,1)-obj.Ps(3,1));
+%             b2 = obj.Ps(3,2)-a2*obj.Ps(3,1);
+% 
+%             bound1 = obj.Ps(1,1)*a1+b1;
+%             bound2 = obj.Ps(2,1)*a1+b1;
+%             bound3 = obj.Ps(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_ps = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_ps = (x-b2)/a2;
+%             else 
+%                 u_ps = 0;
+%             end
         end
         
         %inverse membership function PVS
         function [u_pvs] = PVS(obj, x)
-            a1 = (obj.Pvs(1,2)-obj.Pvs(2,2))/(obj.Pvs(1,1)-obj.Pvs(2,1));
-            b1 = obj.Pvs(1,2)-a1*obj.Pvs(1,1);
-
-            a2 = (obj.Pvs(2,2)-obj.Pvs(3,2))/(obj.Pvs(2,1)-obj.Pvs(3,1));
-            b2 = obj.Pvs(3,2)-a2*obj.Pvs(3,1);
-
-            bound1 = obj.Pvs(1,1)*a1+b1;
-            bound2 = obj.Pvs(2,1)*a1+b1;
-            bound3 = obj.Pvs(3,1)*a2+b2;
-
-            if x>=min(bound1,bound2) && x<=max(bound1, bound2)
-                u_pvs = (x-b1)/a1;
-
-            elseif x>min(bound2,bound3) && x<max(bound2,bound3)
-                u_pvs = (x-b2)/a2;
-            else 
-                u_pvs = 0;
-            end
+            u_pvs = obj.Pvs(2,1) + 0.5*(obj.Pvs(1,1)-2*obj.Pvs(2,1)+obj.Pvs(3,1))*(1-x);
+%             a1 = (obj.Pvs(1,2)-obj.Pvs(2,2))/(obj.Pvs(1,1)-obj.Pvs(2,1));
+%             b1 = obj.Pvs(1,2)-a1*obj.Pvs(1,1);
+% 
+%             a2 = (obj.Pvs(2,2)-obj.Pvs(3,2))/(obj.Pvs(2,1)-obj.Pvs(3,1));
+%             b2 = obj.Pvs(3,2)-a2*obj.Pvs(3,1);
+% 
+%             bound1 = obj.Pvs(1,1)*a1+b1;
+%             bound2 = obj.Pvs(2,1)*a1+b1;
+%             bound3 = obj.Pvs(3,1)*a2+b2;
+% 
+%             if x>=min(bound1,bound2) && x<=max(bound1, bound2)
+%                 u_pvs = (x-b1)/a1;
+% 
+%             elseif x>min(bound2,bound3) && x<max(bound2,bound3)
+%                 u_pvs = (x-b2)/a2;
+%             else 
+%                 u_pvs = 0;
+%             end
         end
         
         %inverse membership function PVS
         function [u_ze] = ZE(obj, x)
-            a1 = (obj.Ze(1,2)-obj.Ze(2,2))/(obj.Ze(1,1)-obj.Ze(2,1));
-            b1 = obj.Ze(1,2)-a1*obj.Ze(1,1);
-
-            a2 = (obj.Ze(2,2)-obj.Ze(3,2))/(obj.Ze(2,1)-obj.Ze(3,1));
-            b2 = obj.Ze(3,2)-a2*obj.Ze(3,1);
-
-            bound1 = obj.Ze(1,1)*a1+b1;
-            bound2 = obj.Ze(2,1)*a1+b1;
-            bound3 = obj.Ze(3,1)*a2+b2;
-
-            if x >= min(bound1,bound2) &&  x<= max(bound1, bound2)
-                u_ze = (x-b1)/a1; 
-
-            elseif x > min(bound2,bound3) && x < max(bound2,bound3)
-                u_ze = (x-b2)/a2;
-            else 
-                u_ze = 0;
-            end
+            u_ze = obj.Ze(2,1) + 0.5*(obj.Ze(1,1)-2*obj.Ze(2,1)+obj.Ze(3,1))*(1-x);
+%             a1 = (obj.Ze(1,2)-obj.Ze(2,2))/(obj.Ze(1,1)-obj.Ze(2,1));
+%             b1 = obj.Ze(1,2)-a1*obj.Ze(1,1);
+% 
+%             a2 = (obj.Ze(2,2)-obj.Ze(3,2))/(obj.Ze(2,1)-obj.Ze(3,1));
+%             b2 = obj.Ze(3,2)-a2*obj.Ze(3,1);
+% 
+%             bound1 = obj.Ze(1,1)*a1+b1;
+%             bound2 = obj.Ze(2,1)*a1+b1;
+%             bound3 = obj.Ze(3,1)*a2+b2;
+% 
+%             if x >= min(bound1,bound2) &&  x<= max(bound1, bound2)
+%                 u_ze = (x-b1)/a1; 
+% 
+%             elseif x > min(bound2,bound3) && x < max(bound2,bound3)
+%                 u_ze = (x-b2)/a2;
+%             else 
+%                 u_ze = 0;
+%             end
         end
     end
 end
