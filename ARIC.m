@@ -148,7 +148,7 @@ classdef ARIC < handle
     
     methods (Static)
         function flag = checkForFailure(x)
-            if abs(x(1)) > 2.4 || abs(x(3)) > pi/15
+            if abs(x(1)) > 2.4 || abs(x(3)) > 12 %pi/15
                 flag = true;
             else
                 flag = false;

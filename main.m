@@ -59,7 +59,7 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0 0.1 0]';
+    x(:, 1) = [0 0 5 0]';
     
     failed = false;
     reset = true;
@@ -74,6 +74,7 @@ while ~learningComplete
         end
         f = @(x) systemDynamics(x, u(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), par.sim.h);
+        x(3:4) = rad2deg(x(3:4));
         failed = aric.updateWeights(x(:, i), reset);
         
         if reset
