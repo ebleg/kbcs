@@ -59,7 +59,7 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0 0.2 0]';
+    x(:, 1) = [0 0 0.1 0]';
     
     failed = false;
     reset = true;

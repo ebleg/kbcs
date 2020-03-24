@@ -1,7 +1,7 @@
 function [w] = fuzzifier(x, D)
 % Fuzzifies the input variables
 
-x = [x; 1]; % add bias unit to input vector
+%x = [x; 1]; % add bias unit to input vector
 %% Retrieve Rules
 run FuzzyRules
 Rules = Fuzzy_Rules(:,1:5);

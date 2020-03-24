@@ -34,12 +34,12 @@ classdef ARIC < handle
             obj.betah = par.aric.betah;
             obj.gamma = par.aric.gamma;        
         
-            % Action-state Evaluation Method weights
+            %Action-state Evaluation Method weights
             obj.A = rand_int(obj.n, obj.n); % SQUARE MATRIX
             obj.b = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
             obj.c = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
-            
-            % Action Selection Network
+
+            %Action Selection Network
             obj.D = rand_int(obj.h, obj.n); % HxN MATRIX
             obj.e = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
             obj.f = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
@@ -64,7 +64,9 @@ classdef ARIC < handle
         % Adapting the ARIC based on a new state
         function flag = updateWeights(obj, x, reset)
             % Compute necessary values from AEN
+            %x(3:4) = rad2deg(x(3:4));
             x2 = [x' 1]';
+            
             flag = obj.checkForFailure(x2);
             
             y1 = obj.AENHiddenLayer(obj.x1); % y[t, t]
@@ -113,15 +115,16 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
-            x(3:4) = rad2deg(x(3:4));
+            %x(3:4) = rad2deg(x(3:4));
             w = fuzzifier(x, obj.D);
             m = defuzzifier(w);
-            filter = m ~= 0;
-            u = sum(obj.f(filter).*m(filter).*w(filter))/sum(w(filter).*obj.f(filter));
+            %filter = m ~= 0;
+            %u = sum(obj.f(filter).*m(filter).*w(filter))/sum(w(filter).*obj.f(filter));
+            u = sum(obj.f.*m.*w)/sum(w.*obj.f);
         end
         
         function p = confidenceComputation(obj, x)
-            x(3:4) = rad2deg(x(3:4));
+            %x(3:4) = rad2deg(x(3:4));
             obj.z = obj.sigmoid(obj.D*x); % We'll need z later for the weight modification
             p = obj.e*x + obj.f*obj.z;
         end

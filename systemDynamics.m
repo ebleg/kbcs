@@ -6,7 +6,7 @@ function [dX] = systemDynamics(X, U, param)
 %   friction coefficients etc. 
 %       X = state vector
 %       X = [x, dx/dt, theta, dtheta/dt]'
-
+    X(3:4) = deg2rad(X(3:4));
     ml = param.sys.m*param.sys.l;
     M = param.sys.m + param.sys.mc;
         

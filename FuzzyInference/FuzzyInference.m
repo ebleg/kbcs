@@ -2,7 +2,8 @@ function [u] = FuzzyInference()
 %% Main fuzzy function, uses the folders Fuzzifier and Defuzzifier
 
 % random input to test function
-x = rand(4,1);
+%x = rand(4,1);
+x = [0 0 0.1/pi*180 0 1]';
 D = rand(13,5);
 F = rand(13,1);
 
