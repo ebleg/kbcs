@@ -113,7 +113,7 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
-%             x(3:4) = rad2deg(x(3:4));
+            x(3:4) = rad2deg(x(3:4));
             w = fuzzifier(x, obj.D);
             m = defuzzifier(w);
             filter = m ~= 0;
@@ -121,6 +121,7 @@ classdef ARIC < handle
         end
         
         function p = confidenceComputation(obj, x)
+            x(3:4) = rad2deg(x(3:4));
             obj.z = obj.sigmoid(obj.D*x); % We'll need z later for the weight modification
             p = obj.e*x + obj.f*obj.z;
         end

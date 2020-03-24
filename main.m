@@ -19,8 +19,8 @@ P = path(P, './fuzzyInference/defuzzifier');
 load('parameters_v3.mat'); % System parameters from Anderson [13]
 % load('parameters_easy.mat'); % Longer pole length
 
-par.sim.h = 1e-1;
-par.sim.T_MAX = 1e2;
+par.sim.h = 1e-2;
+par.sim.T_MAX = 1e1;
 
 %% Linearization
 % Compute Jacobians - 3d party code
@@ -48,6 +48,8 @@ learningComplete = false;
 nTries = 0;
 maxTries = 1e5;
 
+convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
+
 % Learning loop
 while ~learningComplete
     % Initialize variables
@@ -57,14 +59,19 @@ while ~learningComplete
     i = 2; % Don't overwrite initial condition
 
     % Initial conditions
-    x(:, 1) = [0 0 0.1 0]';
+    x(:, 1) = [0 0 0.2 0]';
     
     failed = false;
     reset = true;
     
+%     convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
+    
     % Simulation loop
     while ~failed && i <= par.sim.T_MAX/par.sim.h 
         u(i) = aric.getControllerOutput(x(:, i-1));
+        if isnan(u(i))
+            error('NaN input');
+        end
         f = @(x) systemDynamics(x, u(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), par.sim.h);
         failed = aric.updateWeights(x(:, i), reset);
