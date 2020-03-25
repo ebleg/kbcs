@@ -46,7 +46,7 @@ nstates = 4;
 aric = ARIC(par);
 learningComplete = false;
 nTries = 0;
-maxTries = 1e5;
+maxTries = 3;
 
 convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
 
@@ -81,10 +81,10 @@ while ~learningComplete
         end
         i = i + 1;
     end
-    
+
     nTries = nTries + 1;
     fprintf('Try #%d: t_max = %f\n', nTries, i*par.sim.h)
-      
+
     if i >= round(par.sim.T_MAX/par.sim.h, 0) || nTries == maxTries
        learningComplete = true; 
     end
