@@ -21,8 +21,8 @@ classdef ARIC < handle
             % ARIC Construct an instance of this class
             % n = number of states + 1 (4 in the cart pole example)
             % h = number of rules (13 in the cart pole example)
-            a = -0.01; % From Anderson [13]
-            b = 0.01;
+            a = 0; % From Anderson [13]
+            b = 0.1;
             rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);  % random numbers in [a,b]
             
             obj.n = par.aric.n;

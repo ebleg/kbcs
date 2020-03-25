@@ -46,7 +46,7 @@ nstates = 4;
 aric = ARIC(par);
 learningComplete = false;
 nTries = 0;
-maxTries = 3;
+maxTries = 10;
 
 %convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
 
