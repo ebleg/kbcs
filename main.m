@@ -48,8 +48,11 @@ learningComplete = false;
 nTries = 0;
 maxTries = 1e5;
 
-convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
+%convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
 
+NormX = @(x) [x(1)/2.4, x(2)/2.4, x(3)/(pi/15), x(4)/(pi/15)]'; %normalise x vector
+deNormX = @(x) [x(1)*2.4, x(2)*2.4, x(3)*(pi/15), x(4)*(pi/15)]'; %denormalise x vector
+    
 % Learning loop
 while ~learningComplete
     % Initialize variables
@@ -57,25 +60,23 @@ while ~learningComplete
     x = nan(nstates, numel(trange));
     u = nan(size(trange));
     i = 2; % Don't overwrite initial condition
-
-    % Initial conditions
-    x(:, 1) = [0 0 5 0]';
     
+    % Initial conditions
+    x(:, 1) = [0 0 0.1 0]; %x(1:2) in [m], x(3:4) in [rad]
     failed = false;
     reset = true;
     
-%     convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
-    
     % Simulation loop
     while ~failed && i <= par.sim.T_MAX/par.sim.h 
-        u(i) = aric.getControllerOutput(x(:, i-1));
+        u(i) = aric.getControllerOutput(NormX(x(:, i-1)));
         if isnan(u(i))
             error('NaN input');
         end
+        
         f = @(x) systemDynamics(x, u(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), par.sim.h);
-        x(3:4) = rad2deg(x(3:4));
-        failed = aric.updateWeights(x(:, i), reset);
+        
+        failed = aric.updateWeights(NormX(x(:, i)), reset);
         
         if reset
             reset = false;

@@ -21,8 +21,8 @@ classdef ARIC < handle
             % ARIC Construct an instance of this class
             % n = number of states + 1 (4 in the cart pole example)
             % h = number of rules (13 in the cart pole example)
-            a = -0.1; % From Anderson [13]
-            b = 0.1;
+            a = -0.01; % From Anderson [13]
+            b = 0.01;
             rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);  % random numbers in [a,b]
             
             obj.n = par.aric.n;
@@ -43,6 +43,10 @@ classdef ARIC < handle
             obj.D = rand_int(obj.h, obj.n); % HxN MATRIX
             obj.e = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
             obj.f = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
+
+%             obj.D = 0.1*rand(obj.h, obj.n); % HxN MATRIX
+%             obj.e = 0.1*rand(1, obj.n); % ROW VECTOR WITH LENGTH N
+%             obj.f = 0.1*rand(1, obj.h); % ROW VECTOR WITH LENGTH H
             
             obj.s = 0; % SCALAR
             obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H  
@@ -64,7 +68,6 @@ classdef ARIC < handle
         % Adapting the ARIC based on a new state
         function flag = updateWeights(obj, x, reset)
             % Compute necessary values from AEN
-            %x(3:4) = rad2deg(x(3:4));
             x2 = [x' 1]';
             
             flag = obj.checkForFailure(x2);
@@ -115,7 +118,6 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
-            %x(3:4) = rad2deg(x(3:4));
             w = fuzzifier(x, obj.D);
             m = defuzzifier(w);
             %filter = m ~= 0;
@@ -124,9 +126,9 @@ classdef ARIC < handle
         end
         
         function p = confidenceComputation(obj, x)
-            %x(3:4) = rad2deg(x(3:4));
             obj.z = obj.sigmoid(obj.D*x); % We'll need z later for the weight modification
             p = obj.e*x + obj.f*obj.z;
+            
         end
         
         function u_mod = stochasticActionModifier(obj, u, p)
@@ -148,7 +150,7 @@ classdef ARIC < handle
     
     methods (Static)
         function flag = checkForFailure(x)
-            if abs(x(1)) > 2.4 || abs(x(3)) > 12 %pi/15
+            if abs(x(1)) > 1 || abs(x(3)) > 1 
                 flag = true;
             else
                 flag = false;

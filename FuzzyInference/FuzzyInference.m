@@ -3,9 +3,12 @@ function [u] = FuzzyInference()
 
 % random input to test function
 %x = rand(4,1);
-x = [0 0 0.1/pi*180 0 1]';
-D = rand(13,5);
-F = rand(13,1);
+a = 0; % From Anderson [13]
+b = 0.1;
+rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);
+x = [0 0 0 0 1]';
+D = rand_int(13,5);
+F = rand_int(13,1);
 
 %FuzzyInference selects the control action required to balance the cartpole
 
@@ -20,8 +23,8 @@ F = rand(13,1);
 %F = matrix(13,1) : connection weights between hidden layer and output
 
 %% add paths
-addpath( "Defuzzifier",...
-         "Fuzzifier")
+addpath( './Defuzzifier',...
+         './Fuzzifier')
 
 %% start code
 w = fuzzifier(x, D);
