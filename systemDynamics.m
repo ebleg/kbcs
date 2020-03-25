@@ -12,7 +12,7 @@ function [dX] = systemDynamics(X, U, param)
         
     d2theta = (param.sys.g*sin(X(3)) ...
            + cos(X(3))*(-U - ml*X(4)^2*sin(X(3)) + param.sys.muc*sign(X(2)))/M ...
-           - param.sys.mup*X(4)/ml)/param.sys.l/(4/3 - (param.sys.m*cos(X(3))^2)/M);
+           - param.sys.mup*X(4)/ml)/(param.sys.l*(4/3 - (param.sys.m*cos(X(3))^2)/M));
  
     d2x = (U + ml*(X(4)^2*sin(X(3)) - d2theta*cos(X(3))) - param.sys.muc*sign(X(2)))/M;
     dX = [X(2) d2x X(4) d2theta]';
