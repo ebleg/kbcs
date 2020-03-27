@@ -46,7 +46,7 @@ nstates = 4;
 aric = ARIC(par);
 learningComplete = false;
 nTries = 0;
-maxTries = 200;
+maxTries = 12;
 
 %convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
 
@@ -64,7 +64,7 @@ while ~learningComplete
     % Initial conditions
 %     x(:, 1) = [0, -3 + 6*rand(), -0.15 + 0.3*rand(), -0.5 + rand()]; %x(1:2) in [m], x(3:4) in [rad]
     
-    x(:, 1) = [0, 0, 0.1, 0.4]; %x(1:2) in [m], x(3:4) in [rad]
+    x(:, 1) = [0, 0, 0.1, 0]; %x(1:2) in [m], x(3:4) in [rad]
 
     failed = false;
     reset = true;
