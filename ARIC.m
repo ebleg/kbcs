@@ -46,9 +46,9 @@ classdef ARIC < handle
             obj.D2 = rand_int(obj.h, obj.n); % HxN MATRIX
             obj.e2 = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
             obj.f2 = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
-         
+
             obj.s = 1; % SCALAR
-            obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H  
+            obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H
             obj.x1 = zeros(obj.n, 1);
             end
         
@@ -93,7 +93,7 @@ classdef ARIC < handle
             obj.f2 = obj.f2 + (obj.rho*rhat*obj.s*obj.z)';
             obj.D2 = obj.D2 + obj.rhoh*rhat*obj.z.*(1 - obj.z).*sign(obj.f2)'*obj.s*obj.x1';
         end
-        
+
         %%
         % *Action-State Evaluation*
         function y = AENHiddenLayer(obj, x)
