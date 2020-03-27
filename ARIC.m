@@ -10,7 +10,7 @@ classdef ARIC < handle
     end
     
     properties % Parameters
-        n, h, rho, rhoh, beta, betah, gamma, gain;
+        n, h, rho, rhoh, beta, betah, gamma;
     end
     
     methods
@@ -21,8 +21,8 @@ classdef ARIC < handle
             % ARIC Construct an instance of this class
             % n = number of states + 1 (4 in the cart pole example)
             % h = number of rules (13 in the cart pole example)
-            a = -0.1; % From Anderson [13]
-            b = 0.1;
+            a = 0; % From Anderson [13]
+            b = 0.01;
             rand_int = @(dim1, dim2) a + (b-a).*rand(dim1, dim2);  % random numbers in [a,b]
             
             obj.n = par.aric.n;
@@ -50,7 +50,6 @@ classdef ARIC < handle
             obj.s = 1; % SCALAR
             obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H
             obj.x1 = zeros(obj.n, 1);
-            obj.gain = 1;
             end
         
         %%
@@ -63,9 +62,10 @@ classdef ARIC < handle
             u = obj.fuzzyInference(obj.x1); % Compute u based on fuzzy rules
             p = obj.confidenceComputation(obj.x1); % Compute confidence p
             F = obj.stochasticActionModifier(u, p); % Compute Stochastic Object Modifier F
-%             obj.e1 = obj.e2;
-%             obj.f1 = obj.f2;
-%             obj.D1 = obj.D2;
+            
+            obj.e1 = obj.e2;
+            obj.f1 = obj.f2;
+            obj.D1 = obj.D2;
         end
         
         % Adapting the ARIC based on a new state
@@ -121,14 +121,16 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
-            w = min(1, max(0, fuzzifier(x, obj.D2)));
-            m = defuzzifier(w); % clip vector between 0 and 1
-            u = obj.gain*sum(obj.f2.*m.*w)/sum(w.*obj.f2);
+            w = fuzzifier(x, obj.D1);
+            m = defuzzifier(w);
+%             filter = m ~= 0;
+%             u = sum(obj.f1(filter).*m(filter).*w(filter))/sum(w(filter).*obj.f1(filter));
+            u = sum(obj.f1.*m.*w)/sum(w.*obj.f1);
         end
         
         function p = confidenceComputation(obj, x)
-            obj.z = obj.sigmoid(obj.D2*x); % We'll need z later for the weight modification
-            p = obj.sigmoid(obj.e2*x + obj.f2*obj.z);
+            obj.z = obj.sigmoid(obj.D1*x); % We'll need z later for the weight modification
+            p = obj.e1*x + obj.f1*obj.z;
         end
         
         function u_mod = stochasticActionModifier(obj, u, p)
@@ -139,6 +141,7 @@ classdef ARIC < handle
            else
                u_mod = -u;
            end
+%            u_mod = 2*q*u - u; % Alternative resolution of q
            
            if sign(u_mod) ~= sign(u)
                obj.s = 1 - p; % We'll need s later for the weight modification
