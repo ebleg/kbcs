@@ -41,57 +41,67 @@ f_linearized = @(t, X) A*X + B*forcing(t);
 
 %% Neuro-fuzzy controller simulation
 
+
 %convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
 
 NormX = @(x) [x(1)/2.4, x(2)/2.4, x(3)/(pi/15), x(4)]'; %normalise x vector
 deNormX = @(x) [x(1)*2.4, x(2)*2.4, x(3)/(pi/15), x(4)]'; %denormalise x vector
 nstates = 4;
+
+relSens = [1e-2 1e-1 1 10 1e2];
+parOriginal = par.sys.m;
+
 trange = nan(size(0:par.sim.h:par.sim.T_MAX)); % Useful for plotting, trange and x will always have the same length
 
+% Learning loop
+par.sys.m = relSens(k)*parOriginal;
 % Initialize controller
 aric = ARIC(par);
 learningComplete = false;
 nTries = 0;
 maxTries = 100;
-
 while ~learningComplete
     % Initialize variables
     x = nan(nstates, numel(trange));
     u = nan(size(trange));
     i = 2; % Don't overwrite initial condition
-    
+
     % Initial conditions
+
     x(:, 1) = [0, 0, 0.15, 0]; %x(1:2) in [m], x(3:4) in [rad]
-    
+
     failed = false;
     reset = true;
-    
+
     % Simulation loop
-    while ~failed && i <= par.sim.T_MAX/par.sim.h
+    while ~failed && i <= par.sim.T_MAX/par.sim.h 
         failed = aric.updateWeights(NormX(x(:, i-1)), reset);
         u(i) = aric.getControllerOutput(NormX(x(:, i-1)));
         if isnan(u(i))
             error('NaN input');
         end
-        
+
         f = @(x) systemDynamics(x, u(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
         x(:, i) = RK4(f, x(:, i-1), par.sim.h);
-        
+
         if reset
             reset = false;
         end
         i = i + 1;
     end
-    
+
     nTries = nTries + 1;
     fprintf('Try #%d: t_max = %f\n', nTries, i*par.sim.h)
-    
+
     if i >= round(par.sim.T_MAX/par.sim.h, 0) || nTries == maxTries
-        learningComplete = true;
+       learningComplete = true; 
     end
 end
+XALL(:,:,k) = x;
+UALL(:,:,k) = u;
+fprintf('Sensitivity parameter %d', k)
 
-visualize(x, u, par)
+
 path(oldpath);
 
 

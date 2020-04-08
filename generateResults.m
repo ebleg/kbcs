@@ -20,7 +20,7 @@ load('parameters_v3.mat'); % System parameters from Anderson [13]
 % load('parameters_easy.mat'); % Longer pole length
 
 par.sim.h = 1e-2;
-par.sim.T_MAX = 10;
+par.sim.T_MAX = 1e1;
 
 %% Linearization
 % Compute Jacobians - 3d party code
@@ -30,69 +30,69 @@ B = jacobianest(@(U) systemDynamics([0 0 0 0]', U, par), 0);
 f_linearized = @(t, X) A*X + B*forcing(t);
 
 %% Simple LQR control
-% R = eye(4);
-% Q = 1;
-% N = zeros(4, 1);
-% K = lqr(A, B, R, Q, N);
-% lqrsys = ss(A - B*K, B, eye(4), 0);
-% resp = step(ss);
-% 
-% LQR_nl = @(t, x) systemDynamics(x, -K*x, par);
+R = eye(4);
+Q = 1;
+N = zeros(4, 1);
+K = lqr(A, B, R, Q, N);
+lqrsys = ss(A - B*K, B, eye(4), 0);
+resp = step(ss);
+
+LQR_nl = @(t, x) systemDynamics(x, -K*x, par);
 
 %% Neuro-fuzzy controller simulation
-
-%convertUnits = @(x) [x(1:2); rad2deg(x(3:4))];
-
-NormX = @(x) [x(1)/2.4, x(2)/2.4, x(3)/(pi/15), x(4)]'; %normalise x vector
-deNormX = @(x) [x(1)*2.4, x(2)*2.4, x(3)/(pi/15), x(4)]'; %denormalise x vector
 nstates = 4;
-trange = nan(size(0:par.sim.h:par.sim.T_MAX)); % Useful for plotting, trange and x will always have the same length
 
 % Initialize controller
 aric = ARIC(par);
+tdvfa = TDVFA();
 learningComplete = false;
-nTries = 0;
-maxTries = 100;
+nTriesARIC = 0;
+nTriesTD = 0;
+maxTries = 1e3;
 
+NormX = @(x) [x(1)/2.4, x(2)/2.4, x(3)/(pi/15), x(4)]'; %normalise x vector
+deNormX = @(x) [x(1)*2.4, x(2)*2.4, x(3)/(pi/15), x(4)]'; %denormalise x vector
+
+xlqr = nan(nstates, numel(trange));
+ulqr = nan(size(trange));
+
+% Learning loop ARIC
 while ~learningComplete
     % Initialize variables
-    x = nan(nstates, numel(trange));
-    u = nan(size(trange));
+    trange = nan(size(0:par.sim.h:par.sim.T_MAX)); % Useful for plotting, trange and x will always have the same length
+    xar = nan(nstates, numel(trange));
+    uar = nan(size(trange));
     i = 2; % Don't overwrite initial condition
     
-    % Initial conditions
-    x(:, 1) = [0, 0, 0.15, 0]; %x(1:2) in [m], x(3:4) in [rad]
-    
+    % Initial conditions    
+    xar(:, 1) = [0, 0, 0.2, 0]; %x(1:2) in [m], x(3:4) in [rad]
+
     failed = false;
     reset = true;
     
-    % Simulation loop
-    while ~failed && i <= par.sim.T_MAX/par.sim.h
-        failed = aric.updateWeights(NormX(x(:, i-1)), reset);
-        u(i) = aric.getControllerOutput(NormX(x(:, i-1)));
+    % Simulation loop ARIC
+    while ~failed && i <= par.sim.T_MAX/par.sim.h 
+        failed = aric.updateWeights(NormX(xar(:, i-1)), reset);
+        uar(i) = aric.getControllerOutput(NormX(xar(:, i-1)));
         if isnan(u(i))
             error('NaN input');
         end
         
-        f = @(x) systemDynamics(x, u(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
-        x(:, i) = RK4(f, x(:, i-1), par.sim.h);
+        f = @(x) systemDynamics(x, uar(i), par); % New function handle at each timestep probably computational nightmare, but leave it for now
+        xar(:, i) = RK4(f, xar(:, i-1), par.sim.h);
         
         if reset
             reset = false;
         end
         i = i + 1;
     end
-    
-    nTries = nTries + 1;
-    fprintf('Try #%d: t_max = %f\n', nTries, i*par.sim.h)
-    
-    if i >= round(par.sim.T_MAX/par.sim.h, 0) || nTries == maxTries
-        learningComplete = true;
+
+    nTriesARIC = nTriesARIC + 1;
+    fprintf('Try #%d: t_max = %f\n', nTriesARIC, i*par.sim.h)
+
+    if i >= round(par.sim.T_MAX/par.sim.h, 0) || nTriesARIC == maxTries
+       learningComplete = true; 
     end
 end
 
-visualize(x, u, par)
 path(oldpath);
-
-
-

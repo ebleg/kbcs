@@ -40,12 +40,15 @@ classdef ARIC < handle
             obj.c = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
 
             %Action Selection Network
-            obj.D1 = rand_int(obj.h, obj.n); % HxN MATRIX
-            obj.e1 = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
-            obj.f1 = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
-            obj.D2 = rand_int(obj.h, obj.n); % HxN MATRIX
-            obj.e2 = rand_int(1, obj.n); % ROW VECTOR WITH LENGTH N
-            obj.f2 = rand_int(1, obj.h); % ROW VECTOR WITH LENGTH H
+            
+            rand_int2 = @(dim1, dim2, center, spread) center - spread + (2*spread)*rand(dim1, dim2);  % not so random numbers
+
+            obj.D1 = rand_int2(obj.h, obj.n, 1/obj.h*obj.n, 0.1); % HxN MATRIX
+            obj.e1 = rand_int2(1, obj.n, 1/obj.h*obj.n, 0.01); % ROW VECTOR WITH LENGTH N
+            obj.f1 = rand_int2(1, obj.h, 1/obj.h*obj.n, 0.01); % ROW VECTOR WITH LENGTH H
+            obj.D2 = rand_int2(obj.h, obj.n, 1/obj.h*obj.n, 0.01); % HxN MATRIX
+            obj.e2 = rand_int2(1, obj.n, 1/obj.h*obj.n, 0.01); % ROW VECTOR WITH LENGTH N
+            obj.f2 = rand_int2(1, obj.h, 1/obj.h*obj.n, 0.01); % ROW VECTOR WITH LENGTH H
 
             obj.s = 1; % SCALAR
             obj.z = zeros(obj.h, 1); % COLUMN VECTOR WITH LENGHT H
@@ -63,9 +66,9 @@ classdef ARIC < handle
             u = obj.fuzzyInference(obj.x1); % Compute u based on fuzzy rules
             p = obj.confidenceComputation(obj.x1); % Compute confidence p
             F = obj.stochasticActionModifier(u, p); % Compute Stochastic Object Modifier F
-%             obj.e1 = obj.e2;
-%             obj.f1 = obj.f2;
-%             obj.D1 = obj.D2;
+            obj.e1 = obj.e2;
+            obj.f1 = obj.f2;
+            obj.D1 = obj.D2;
         end
         
         % Adapting the ARIC based on a new state
@@ -121,24 +124,28 @@ classdef ARIC < handle
         % *Action Selection Network methods*
         function u = fuzzyInference(obj, x)
             % Based on Bart's FuzzyInference
-            w = min(1, max(0, fuzzifier(x, obj.D2)));
+            w = min(1, max(0, fuzzifier(x, obj.D1)));
             m = defuzzifier(w); % clip vector between 0 and 1
-            u = obj.gain*sum(obj.f2.*m.*w)/sum(w.*obj.f2);
+            u = obj.gain*sum(obj.f1.*m.*w)/sum(w.*obj.f1);
         end
         
         function p = confidenceComputation(obj, x)
-            obj.z = obj.sigmoid(obj.D2*x); % We'll need z later for the weight modification
-            p = obj.sigmoid(obj.e2*x + obj.f2*obj.z);
+            obj.z = obj.sigmoid(obj.D1*x); % We'll need z later for the weight modification
+            p = obj.sigmoid(obj.e1*x + obj.f1*obj.z);
+%             p = obj.e1*x + obj.f1*obj.z;
         end
         
         function u_mod = stochasticActionModifier(obj, u, p)
            % _Implementation of functions o and s in the paper_
            q = (p + 1)/2;
-           if q > (1-q)
-               u_mod = u;
-           else
-               u_mod = -u;
-           end
+%             q = p;
+%            if q > (1-q)
+%                u_mod = u;
+%            else
+%                u_mod = -u;
+%            end
+%            u_mod = 2*q*u - u;
+           u_mod = u;
            
            if sign(u_mod) ~= sign(u)
                obj.s = 1 - p; % We'll need s later for the weight modification
