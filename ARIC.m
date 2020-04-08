@@ -138,14 +138,14 @@ classdef ARIC < handle
         function u_mod = stochasticActionModifier(obj, u, p)
            % _Implementation of functions o and s in the paper_
            q = (p + 1)/2;
-%             q = p;
-%            if q > (1-q)
-%                u_mod = u;
-%            else
-%                u_mod = -u;
-%            end
+            q = p;
+           if q > (1-q)
+               u_mod = u;
+           else
+               u_mod = -u;
+           end
 %            u_mod = 2*q*u - u;
-           u_mod = u;
+%            u_mod = u;
            
            if sign(u_mod) ~= sign(u)
                obj.s = 1 - p; % We'll need s later for the weight modification

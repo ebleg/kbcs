@@ -3,11 +3,7 @@
 
 *by Bart Kevers, Britt Krabbenborg, Maxime Croft & Emiel Legrand*
 
-## Current issues
-- No bias unit in ASN neural network (Britt)
-- Slow implementation of (de)fuzzification (Bart)
-- Weight vectors `e`, `f` and stochastic modification measure `s` grow quickly to infinity during the learning process. It is currenty unclear which of those is exactly causing the problem since they are all used to update each other. 
-- For the integration of the system a new function handle is created every timestep, which is very inefficient. 
+To run the code, run `main.m`. All the controller functionality is implemented in the ARIC class. The fuzzification and defuzzification methods can be found in the `fuzzyInference` folder. 
 
 ## Project structure
 - `doc` additional documentation on the project
